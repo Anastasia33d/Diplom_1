@@ -1,4 +1,5 @@
 package tests;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -13,11 +14,17 @@ public class IngredientsTest {
     private final IngredientType type;
     private final String name;
     private final float price;
+    private Ingredient ingredient;
 
     public IngredientsTest(IngredientType type, String name, float price) {
         this.type = type;
         this.name = name;
         this.price = price;
+    }
+
+    @Before
+    public void setUp() {
+        ingredient = new Ingredient(type, name, price);
     }
 
     @Parameterized.Parameters(name = "Тип ингредиента, наименование и цена: {0} {1} {2}")
@@ -33,21 +40,18 @@ public class IngredientsTest {
     //Проверка корректности возвращаемой цены ингредиента
     @Test
     public void getPriceTest() {
-        Ingredient ingredient = new Ingredient(type, name, price);
         assertEquals("Цена ингредиента рассчитана неверно", price, ingredient.getPrice(), 0.001f);
     }
 
     //Проверка корректности возвращаемого наименования ингредиента
     @Test
     public void getNameTest() {
-        Ingredient ingredient = new Ingredient(type, name, price);
         assertEquals("Наименование ингредиента не совпадает", name, ingredient.getName());
     }
 
     //Проверка корректности возвращаемого типа ингредиента
     @Test
     public void getTypeTest() {
-        Ingredient ingredient = new Ingredient(type, name, price);
         assertEquals("Тип ингредиента не совпадает", type, ingredient.getType());
     }
 }

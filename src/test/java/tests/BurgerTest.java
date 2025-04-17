@@ -1,6 +1,8 @@
 package tests;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.Test;
 import praktikum.Bun;
@@ -38,14 +40,14 @@ public class BurgerTest {
     @Test
     public void setBunTest() {
         burger.setBuns(mockBun);
-        assertEquals(mockBun, burger.bun);
+        assertEquals("Булочка должна быть установлена корректно", mockBun, burger.bun);
     }
 
     //Проверка добавления ингредиента
     @Test
     public void addIngredientTest() {
         burger.addIngredient(mockIngredient1);
-        assertTrue(burger.ingredients.contains(mockIngredient1));
+        assertTrue("Ингредиент должен быть добавлен в список ингредиентов", burger.ingredients.contains(mockIngredient1));
     }
 
     //Проверка удаления ингредиента
@@ -54,8 +56,18 @@ public class BurgerTest {
         burger.addIngredient(mockIngredient1);
         burger.addIngredient(mockIngredient2);
         burger.removeIngredient(0);
-        assertFalse(burger.ingredients.contains(mockIngredient1));
-        assertTrue(burger.ingredients.contains(mockIngredient2));
+
+        SoftAssertions softly = new SoftAssertions();
+        // Проверяем, что ингредиент mockIngredient1 был удалён
+        softly.assertThat(burger.ingredients)
+                .as("Проверяем, что ингредиент '%s' был успешно удален из бургера", mockIngredient1)
+                .doesNotContain(mockIngredient1);
+        // Проверяем, что ингредиент mockIngredient2 остался в бургерe
+        softly.assertThat(burger.ingredients)
+                .as("Проверяем, что ингредиент '%s' по-прежнему присутствует в бургере", mockIngredient2)
+                .contains(mockIngredient2);
+
+        softly.assertAll();
     }
 
     //Проверка перемещения ингредиента
@@ -67,6 +79,18 @@ public class BurgerTest {
         burger.moveIngredient(0, 1);
         assertEquals(mockIngredient2, burger.ingredients.get(0));
         assertEquals(mockIngredient1, burger.ingredients.get(1));
+
+        SoftAssertions softly = new SoftAssertions();
+        // Проверка, что ингредиент mockIngredient2 теперь находится на индексе 0
+        softly.assertThat(burger.ingredients.get(0))
+                .as("Проверяем, что ингредиент '%s' находится на позиции 0 после перемещения", mockIngredient2)
+                .isEqualTo(mockIngredient2);
+        // Проверка, что ингредиент mockIngredient1 теперь находится на индексе 1
+        softly.assertThat(burger.ingredients.get(1))
+                .as("Проверяем, что ингредиент '%s' находится на позиции 1 после перемещения", mockIngredient1)
+                .isEqualTo(mockIngredient1);
+
+        softly.assertAll();
     }
 
     //Проверка получения цены бургера
@@ -77,7 +101,7 @@ public class BurgerTest {
         burger.addIngredient(mockIngredient2);
 
         float expectedPrice = 700.0f;
-        assertEquals(expectedPrice, burger.getPrice(), 0.001);
+        assertEquals("Цена бургера должна быть рассчитана корректно", expectedPrice, burger.getPrice(), 0.001);
     }
 
     //Проверка полученяи чека
@@ -97,6 +121,6 @@ public class BurgerTest {
         expected.append(String.format("(==== %s ====)%n", mockBun.getName()));
         expected.append(String.format("%nPrice: %f%n", burger.getPrice()));
 
-        assertEquals(expected.toString(), burger.getReceipt());
+        assertEquals("Чек должен соответствовать ожидаемому формату", expected.toString(), burger.getReceipt());
     }
 }
